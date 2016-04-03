@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -38,25 +39,41 @@ namespace SoapWebServiceClient
                         uri = new Uri(input);
                     }
 
-                    object serviceObject = proxyCache.GetServiceProxyObject(uri);
+                    var serviceInfo = proxyCache.GetProxyInfo(uri);
 
-                    var type = serviceObject.GetType();
-                    Console.WriteLine($"Service name: {type.Name}");
-
-                    Console.WriteLine("Methods:");
-                    foreach (var method in type.GetMethods())
+                    Console.WriteLine("Services:");
+                    foreach(var info in serviceInfo.Endpoints)
                     {
-                        bool isWebServiceMethod = IsWebServiceMethod(method);
-                        if (!isWebServiceMethod)
-                            continue;
+                        Console.WriteLine($" - {info.Name}");
+                        foreach(var method in info.Methods)
+                        {
+                            Console.WriteLine($"    - {method.Name}");
+                        }
+                    }
 
+                    WebEndpointInfo endpointInfo;
+                    if (serviceInfo.Endpoints.Count > 1)
+                    {
+                        Console.Write("Select service name: ");
+                        string name = Console.ReadLine();
+                        endpointInfo = serviceInfo.Endpoints.First(ei => ei.Name == name);
+                    }
+                    else
+                    {
+                        endpointInfo = serviceInfo.Endpoints[0];
+                    }
+
+                    object serviceObject = Activator.CreateInstance(endpointInfo.ProxyType);
+                    Console.WriteLine("Methods:");
+                    foreach (var method in endpointInfo.Methods)
+                    {
                         Console.WriteLine(method);
                     }
 
                     Console.Write("Enter method: ");
                     string methodName = Console.ReadLine();
 
-                    var methodToInvoke = type.GetMethod(methodName);
+                    var methodToInvoke = endpointInfo.Methods.First(m => m.Name == methodName);
 
                     var parameters = new List<object>();
                     foreach (var parameterInfo in methodToInvoke.GetParameters())
@@ -128,19 +145,6 @@ namespace SoapWebServiceClient
         {
             parseMethod = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null);
             return parseMethod != null;
-        }
-
-        private static bool IsWebServiceMethod(MethodInfo method)
-        {
-            foreach (Attribute attr in method.GetCustomAttributes(false))
-            {
-                if (attr is SoapDocumentMethodAttribute || attr is SoapRpcMethodAttribute)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

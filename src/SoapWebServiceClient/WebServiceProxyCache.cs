@@ -23,7 +23,7 @@ namespace SoapWebServiceClient
     {
         private static readonly Logger _Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Dictionary<string, Assembly> _cache = new Dictionary<string, Assembly>();
+        private readonly Dictionary<string, Tuple<Assembly, WebServiceInformation>> _cache = new Dictionary<string, Tuple<Assembly, WebServiceInformation>>();
 
         public WebServiceProxyCache()
         {
@@ -42,23 +42,29 @@ namespace SoapWebServiceClient
         /// </summary>
         public bool WithAsync { get; set; }
 
-        public Assembly GetProxyAssembly(Uri uri)
+        public WebServiceInformation GetProxyInfo(Uri uri)
         {
-            return GetProxyAssembly(uri.AbsoluteUri);
+            return GetProxyInfo(uri.AbsoluteUri);
         }
 
-        public Assembly GetProxyAssembly(string uri)
+        public WebServiceInformation GetProxyInfo(string uri)
         {
-            Assembly asm;
-            if (_cache.TryGetValue(uri, out asm))
+            Tuple<Assembly, WebServiceInformation> info;
+            if (_cache.TryGetValue(uri, out info))
             {
-                return asm;
+                return info.Item2;
             }
 
-            asm = GenerateWebServiceProxyAssembly(new Uri(uri), Namespace, WithAsync, Debug);
-            _cache[uri] = asm;
+            var asm = GenerateWebServiceProxyAssembly(new Uri(uri), Namespace, WithAsync, Debug);
+            var serviceInfo = Create(uri, asm);
+            _cache[uri] = Tuple.Create(asm, serviceInfo);
 
-            return asm;
+            return serviceInfo;
+        }
+
+        public object GetServiceProxyObject(Uri uri, string name)
+        {
+            return GetServiceProxyObject(uri.AbsoluteUri, name);
         }
 
         public object GetServiceProxyObject(Uri uri)
@@ -66,10 +72,19 @@ namespace SoapWebServiceClient
             return GetServiceProxyObject(uri.AbsoluteUri);
         }
 
+        public object GetServiceProxyObject(string uri, string name)
+        {
+            var info = GetProxyInfo(uri);
+            var endpoint = info.Endpoints.First(i => i.Name == name);
+            object serviceObject = Activator.CreateInstance(endpoint.ProxyType);
+            return serviceObject;
+        }
+
         public object GetServiceProxyObject(string uri)
         {
-            var asm = GetProxyAssembly(uri);
-            object serviceObject = InstantiateWebServiceProxy(asm);
+            var info = GetProxyInfo(uri);
+            var endpoint = info.Endpoints.First();
+            object serviceObject = Activator.CreateInstance(endpoint.ProxyType);
             return serviceObject;
         }
 
@@ -226,6 +241,62 @@ namespace SoapWebServiceClient
                 byte[] hash = hashAlg.ComputeHash(inputBytes);
                 return BitConverter.ToString(hash);
             }
+        }
+
+        private static WebServiceInformation Create(string uri, Assembly proxyAssembly)
+        {
+            var serviceTypes = new List<Type>();
+            foreach(var type in proxyAssembly.GetTypes())
+            {
+                if (Attribute.IsDefined(type, typeof(WebServiceBindingAttribute), false))
+                {
+                    serviceTypes.Add(type);
+                }
+            }
+
+            return new WebServiceInformation(uri, serviceTypes.Select(t => new WebEndpointInfo(t)));
+        }
+    }
+
+    class WebServiceInformation
+    {
+        public WebServiceInformation(string uri, IEnumerable<WebEndpointInfo> endpoints)
+        {
+            Uri = uri;
+            Endpoints = endpoints.ToArray();
+        }
+
+        public string Uri { get; }
+
+        public IReadOnlyList<WebEndpointInfo> Endpoints { get; }
+    }
+
+    class WebEndpointInfo
+    {
+        public WebEndpointInfo(Type proxyType)
+        {
+            Name = proxyType.Name;
+            ProxyType = proxyType;
+            Methods = proxyType.GetMethods().Where(mi => IsWebServiceMethod(mi)).ToArray();
+        }
+
+        public string Name { get; }
+
+        public Type ProxyType { get; }
+
+        public IReadOnlyList<MethodInfo> Methods { get; }
+
+        private static bool IsWebServiceMethod(MethodInfo method)
+        {
+            foreach (Attribute attr in method.GetCustomAttributes(false))
+            {
+                if (attr is SoapDocumentMethodAttribute || attr is SoapRpcMethodAttribute)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

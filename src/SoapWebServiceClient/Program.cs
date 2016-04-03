@@ -21,7 +21,7 @@ namespace SoapWebServiceClient
                 var console = new ConsoleTarget();
                 console.Layout = "${longdate}|${level:uppercase=true}|${logger}|${trim-whitespace:${message} ${exception:format=tostring}}";
                 SimpleConfigurator.ConfigureForTargetLogging(console, LogLevel.Trace);
-                var proxyCache = new WebServiceProxyCache() { Debug = true };
+                var proxyCache = new WebServiceProxyCache() { Debug = false };
 
                 while (true)
                 {

@@ -28,12 +28,15 @@ namespace SoapWebService
                 var binding = new BasicHttpBinding();
                 var ep = host.AddServiceEndpoint(typeof(IWebService), binding, uri);
                 ep.Name = "ServiceName1";
-                var ep2 = host.AddServiceEndpoint(typeof(IWebService2), binding, uri);
-                ep2.Name = "ServiceName2";
+
+                // Uncomment for two services hosted at the same endpoint.
+                //var ep2 = host.AddServiceEndpoint(typeof(IWebService2), binding, uri);
+                //ep2.Name = "ServiceName2";
+
                 var smb = new ServiceMetadataBehavior() { HttpGetEnabled = true, HttpGetUrl = uri };
                 host.Description.Behaviors.Add(smb);
 
-                // This only works for a single endpoint.
+                // This only works for a single endpoint. The name will get mangled combination of {binding}_{interface} otherwise.
                 // host.Description.Name = "HostServiceName";
 
                 host.Open();
@@ -58,6 +61,15 @@ namespace SoapWebService
 
         [OperationContract]
         void ComplexObject2(MyClass2 c, DateTime d, Guid g);
+
+        [OperationContract]
+        void ArrayTest(int[] ints);
+
+        [OperationContract]
+        void ListTest(List<int> ints);
+
+        [OperationContract]
+        void TestComplexList(MyClass3 c);
     }
 
     [XmlSerializerFormat]
@@ -89,6 +101,15 @@ namespace SoapWebService
 
         [DataMember]
         public MyClass C { get; set; }
+    }
+
+    public class MyClass3
+    {
+        [DataMember]
+        public List<string> Test { get; set; }
+
+        [DataMember]
+        public string[] Items { get; set; }
     }
 
     public enum Test
@@ -129,15 +150,30 @@ namespace SoapWebService
             LogMethod(new { c, d, g });
         }
 
+        public void SomeMethod(int i)
+        {
+            LogMethod(new { i });
+        }
+
+        public void ArrayTest(int[] ints)
+        {
+            LogMethod(new { ints });
+        }
+
+        public void ListTest(List<int> ints)
+        {
+            LogMethod(new { ints });
+        }
+
+        public void TestComplexList(MyClass3 c)
+        {
+            LogMethod(new { c });
+        }
+
         private static void LogMethod<T>(T parameters, [CallerMemberName]string methodName = null)
         {
             string json = JsonConvert.SerializeObject(parameters, Settings);
             _Logger.Info("Called {0}: {1}", methodName, json);
-        }
-
-        public void SomeMethod(int i)
-        {
-            LogMethod(new { i });
         }
     }
 }

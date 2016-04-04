@@ -91,11 +91,13 @@ namespace SoapWebServiceClient
             {
                 _Logger.Error(e, "An error was encountered");
             }
+
+            ConsoleHelper.PressAnyKey();
         }
 
         private static object ReadValueOfType(string name, Type type)
         {
-            if (type.IsClass && type != typeof(string))
+            if (type.IsClass && type != typeof(string) && !type.IsArray)
             {
                 var p = Activator.CreateInstance(type);
                 foreach (var prop in p.GetType().GetProperties())
@@ -106,15 +108,38 @@ namespace SoapWebServiceClient
 
                 return p;
             }
+            else if (type.IsArray)
+            {
+                var elementType = type.GetElementType();
+
+                Console.WriteLine("Enter an array length: ");
+                string input = Console.ReadLine();
+                int length = int.Parse(input);
+
+                Array a = Array.CreateInstance(elementType, length);
+
+                for(int i = 0; i < length; i++)
+                {
+                    string elementName = $"{name}[{i}]";
+                    object value = ReadValueOfType(elementName, elementType);
+                    a.SetValue(value, i);
+                }
+
+                return a;
+            }
             else
             {
-                Console.Write("Enter a value for {0} {1}: ", name, type);
+                Console.Write("Enter a value for {0} ({1}): ", name, type);
                 string input = Console.ReadLine();
                 object value;
                 MethodInfo parseMethod;
                 try
                 {
-                    if (type.IsEnum)
+                    if (type == typeof(string))
+                    {
+                        value = input;
+                    }
+                    else if (type.IsEnum)
                     {
                         value = Enum.Parse(type, input, true);
                     }

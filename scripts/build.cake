@@ -41,9 +41,10 @@ Task("CopyFiles")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    var path = "../src/**/bin/" + configuration;
-    var files = GetFiles(path + "/**/*.dll") 
-        + GetFiles(path + "/**/*.exe");
+    var globStart = "../src/**/bin/" + configuration + "/**/";
+    var files = GetFiles(globStart + "*.dll") 
+        + GetFiles(globStart + "*.exe")
+		+ GetFiles(globStart + "*.pdb");
 
     // Copy all exe and dll files to the output directory.
 	if (!System.IO.Directory.Exists("../output/bin"))

@@ -17,9 +17,9 @@ using System.Xml.Serialization;
 using Microsoft.CSharp;
 using NLog;
 
-namespace SoapWebServiceClient
+namespace ClientLib
 {
-    class WebServiceProxyCache
+    public class WebServiceProxyCache
     {
         private static readonly Logger _Logger = LogManager.GetCurrentClassLogger();
 
@@ -246,7 +246,7 @@ namespace SoapWebServiceClient
         private static WebServiceInformation Create(string uri, Assembly proxyAssembly)
         {
             var serviceTypes = new List<Type>();
-            foreach(var type in proxyAssembly.GetTypes())
+            foreach (var type in proxyAssembly.GetTypes())
             {
                 if (Attribute.IsDefined(type, typeof(WebServiceBindingAttribute), false))
                 {
@@ -258,7 +258,7 @@ namespace SoapWebServiceClient
         }
     }
 
-    class WebServiceInformation
+    public class WebServiceInformation
     {
         public WebServiceInformation(string uri, IEnumerable<WebEndpointInfo> endpoints)
         {
@@ -271,7 +271,7 @@ namespace SoapWebServiceClient
         public IReadOnlyList<WebEndpointInfo> Endpoints { get; }
     }
 
-    class WebEndpointInfo
+    public class WebEndpointInfo
     {
         public WebEndpointInfo(Type proxyType)
         {

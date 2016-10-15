@@ -1,0 +1,40 @@
+﻿<Window x:Class="ClientUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClientUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.DataContext>
+        <local:MainViewModel />
+    </Window.DataContext>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Grid.Column="0">Address</Label>
+            <DockPanel Grid.Row="0" Grid.Column="1">
+                <Button DockPanel.Dock="Right" Command="{Binding GetCommand}">Get</Button>
+                <TextBox Text="{Binding Address}"></TextBox>
+            </DockPanel>
+            <Label Grid.Row="1" Grid.Column="0">Service</Label>
+            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Endpoints}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedEndpoint}"/>
+            <Label Grid.Row="2" Grid.Column="0">Method</Label>
+            <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Methods}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedMethod}"/>
+        </Grid>
+        <DataGrid ItemsSource="{Binding Parameters}" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

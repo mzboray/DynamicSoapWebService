@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Web.Services.Protocols;
+using ClientLib;
 using NLog;
 using NLog.Config;
 using NLog.Targets;

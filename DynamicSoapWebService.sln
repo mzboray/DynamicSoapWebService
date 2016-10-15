@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoapWebService", "src\SoapWebService\SoapWebService.csproj", "{150EB7EF-0807-4FBD-A247-CB816432BC82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoapWebServiceClient", "src\SoapWebServiceClient\SoapWebServiceClient.csproj", "{0E40FC28-A839-49EF-AF10-2FA6B61A106E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientLib", "src\ClientLib\ClientLib.csproj", "{C5C1C9BB-9B75-42F4-9B4B-D7EC092B1209}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientUI", "src\ClientUI\ClientUI.csproj", "{DC97AF92-72E8-4EB1-A5CF-FA43439EBAA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{0E40FC28-A839-49EF-AF10-2FA6B61A106E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E40FC28-A839-49EF-AF10-2FA6B61A106E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E40FC28-A839-49EF-AF10-2FA6B61A106E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C1C9BB-9B75-42F4-9B4B-D7EC092B1209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C1C9BB-9B75-42F4-9B4B-D7EC092B1209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C1C9BB-9B75-42F4-9B4B-D7EC092B1209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C1C9BB-9B75-42F4-9B4B-D7EC092B1209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC97AF92-72E8-4EB1-A5CF-FA43439EBAA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC97AF92-72E8-4EB1-A5CF-FA43439EBAA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC97AF92-72E8-4EB1-A5CF-FA43439EBAA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC97AF92-72E8-4EB1-A5CF-FA43439EBAA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

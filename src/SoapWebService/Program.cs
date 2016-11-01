@@ -21,19 +21,26 @@ namespace SoapWebService
         {
             SimpleConfigurator.ConfigureForConsoleLogging(LogLevel.Trace);
             var service = new WebService();
-            string hostName = Dns.GetHostEntry("").HostName;
-            Uri uri = new Uri($"http://{hostName}:8095/test");
+            Uri uri = new Uri("http://localhost:8095/test");
             using (ServiceHost host = new ServiceHost(service))
             {
-                var binding = new BasicHttpBinding();
+                var binding = new BasicHttpBinding()
+                {
+                    // needed for localhost in non-admin mode
+                    HostNameComparisonMode = HostNameComparisonMode.Exact,
+                };
                 var ep = host.AddServiceEndpoint(typeof(IWebService), binding, uri);
                 ep.Name = "ServiceName1";
 
                 // Uncomment for two services hosted at the same endpoint.
                 //var ep2 = host.AddServiceEndpoint(typeof(IWebService2), binding, uri);
                 //ep2.Name = "ServiceName2";
-
-                var smb = new ServiceMetadataBehavior() { HttpGetEnabled = true, HttpGetUrl = uri };
+                
+                var smb = new ServiceMetadataBehavior()
+                {
+                    HttpGetEnabled = true,
+                    HttpGetUrl = uri,
+                };
                 host.Description.Behaviors.Add(smb);
 
                 // This only works for a single endpoint. The name will get mangled combination of {binding}_{interface} otherwise.

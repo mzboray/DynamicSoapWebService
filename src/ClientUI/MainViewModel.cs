@@ -31,6 +31,11 @@ namespace ClientUI
 
             GetCommand = ReactiveCommand.CreateAsyncTask(canGet, o => Task.Run(() => _cache.GetProxyInfo(this.Address)));
 
+            GetCommand.ThrownExceptions.Subscribe(x =>
+            {
+                // TODO: Message box or something.
+            });
+
             GetCommand.Subscribe(info =>
             {
                 Endpoints.Clear();

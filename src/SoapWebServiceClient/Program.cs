@@ -97,6 +97,7 @@ namespace SoapWebServiceClient
 
         private static object ReadValueOfType(string name, Type type)
         {
+            Console.WriteLine(name);
             if (type.IsClass && type != typeof(string) && !type.IsArray)
             {
                 var p = Activator.CreateInstance(type);
